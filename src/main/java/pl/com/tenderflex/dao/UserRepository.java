@@ -10,6 +10,8 @@ public interface UserRepository {
 
     void updateLoginDate(Integer userId, LocalDate loginDate);
 
-    List<User> getAll();
+    List<User> getAllByCondition(Integer amountUsers, Integer amountUsersToSkip);
+
+    Integer countAllUsers();
 
 }

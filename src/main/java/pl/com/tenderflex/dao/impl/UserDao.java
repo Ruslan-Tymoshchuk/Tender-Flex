@@ -13,7 +13,8 @@ public class UserDao implements UserRepository {
 
     public static final String GET_USER_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
     public static final String UPDATE_LOGIN_TIME_QUERY = "UPDATE users SET login_date = ? WHERE id = ?";
-    public static final String GET_ALL_USERS_QUERY = "SELECT * FROM users";
+    public static final String GET_ALL_USERS_QUERY = "SELECT * FROM users LIMIT ? OFFSET ?";
+    public static final String COUNT_ALL_USERS_QUERY = "SELECT count(id) FROM users";
 
     private final JdbcTemplate jdbcTemplate;
     private final UserMapper userMapper;
@@ -34,7 +35,12 @@ public class UserDao implements UserRepository {
     }
 
     @Override
-    public List<User> getAll() {
-        return jdbcTemplate.query(GET_ALL_USERS_QUERY, userMapper);
+    public List<User> getAllByCondition(Integer amountUsers, Integer amountUsersToSkip) {
+        return jdbcTemplate.query(GET_ALL_USERS_QUERY, userMapper, amountUsers, amountUsersToSkip);
+    }
+
+    @Override
+    public Integer countAllUsers() {
+        return jdbcTemplate.queryForObject(COUNT_ALL_USERS_QUERY, Integer.class);
     }
 }

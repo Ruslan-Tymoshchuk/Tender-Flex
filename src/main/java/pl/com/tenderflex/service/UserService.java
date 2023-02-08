@@ -1,6 +1,6 @@
 package pl.com.tenderflex.service;
 
-import java.util.List;
+import pl.com.tenderflex.dto.Page;
 import pl.com.tenderflex.dto.UserDetailsResponse;
 import pl.com.tenderflex.model.User;
 
@@ -10,6 +10,6 @@ public interface UserService {
 
     void updateLoginDate(Integer userId);
 
-    List<UserDetailsResponse> getAllUsers();
+    Page<UserDetailsResponse> getAllUsers(Integer currentPage);
 
 }
