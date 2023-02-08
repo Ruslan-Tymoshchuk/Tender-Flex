@@ -1,5 +1,7 @@
 package pl.com.tenderflex.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -7,6 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,14 +25,14 @@ import pl.com.tenderflex.exception.AuthenticationControllerException;
 public class AuthenticationController {
 
     private final AuthenticationProvider authenticationProvider;
-    
+
     public AuthenticationController(AuthenticationProvider authenticationProvider) {
         this.authenticationProvider = authenticationProvider;
     }
-    
+
     @GetMapping("/login")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void performAuthenticate(@RequestBody @Valid AuthenticationRequest reguest,  BindingResult bindingResult) {
+    public void performAuthenticate(@RequestBody @Valid AuthenticationRequest reguest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new AuthenticationControllerException("Email and password should not be empty");
         }
@@ -36,5 +40,15 @@ public class AuthenticationController {
                 .authenticate(new UsernamePasswordAuthenticationToken(reguest.getEmail(), reguest.getPassword()));
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticatedUser);
+    }
+
+    @GetMapping("/log_out")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void performLogOut(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            LogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+            logoutHandler.logout(request, response, authentication);
+        }
     }
 }

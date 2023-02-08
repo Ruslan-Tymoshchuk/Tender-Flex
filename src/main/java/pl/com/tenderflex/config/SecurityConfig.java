@@ -17,6 +17,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeRequests()
             .antMatchers("/**/auth/**").permitAll()
+            .antMatchers("/**/log_out/**").permitAll()
             .antMatchers("/**/tender/create").hasAuthority(String.valueOf(Role.CONTRACTOR))
             .antMatchers("/**/tender/tenders_by_contractor").hasAuthority(String.valueOf(Role.CONTRACTOR))
             .antMatchers("/**/tender/details_for_contractor/{id}").hasAuthority(String.valueOf(Role.CONTRACTOR))
