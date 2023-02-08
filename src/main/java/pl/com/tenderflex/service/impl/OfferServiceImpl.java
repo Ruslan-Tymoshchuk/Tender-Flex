@@ -1,8 +1,6 @@
 package pl.com.tenderflex.service.impl;
 
 import static java.time.LocalDate.*;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -22,11 +20,13 @@ import pl.com.tenderflex.service.OfferService;
 @Service
 public class OfferServiceImpl implements OfferService {
 
-    @Value("${offers.contractor.per.page}")
-    private Integer offersContractorPerPage;
     public static final String OFFER_RECEIVED_STATUS = "OFFER RECEIVED";
     public static final String OFFER_SENT_STATUS = "OFFER SENT";
 
+    @Value("${offers.contractor.per.page}")
+    private Integer offersContractorPerPage;
+    @Value("${offers.bidder.per.page}")
+    private Integer offersBidderPerPage;
     private final FileStorageService fileStorageService;
     private final MapStructMapper offerMapper;
     private final OfferRepository offerRepository;
@@ -86,9 +86,21 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public List<OfferResponse> getOffersByBidder(Integer bidderId) {
+    public Page<OfferResponse> getOffersByBidder(Integer bidderId, Integer currentPage) {
+        Integer amountOffers = currentPage * offersBidderPerPage;
+        Integer amountOffersToSkip = (currentPage - 1) * 5;
+        Integer allOffersAmount = offerRepository.countOffersByBidder(bidderId);
+        Integer totalPages = 1;
+        if (allOffersAmount >= offersContractorPerPage) {
+            totalPages = allOffersAmount / offersContractorPerPage;
+            if (allOffersAmount % offersContractorPerPage > 0) {
+                totalPages++;
+            }
+        }
         try {
-            return offerRepository.getByBidder(bidderId).stream().map(offerMapper::offerToOfferResponse).toList();
+            return new Page<>(currentPage, totalPages,
+                    offerRepository.getByBidder(bidderId, amountOffers, amountOffersToSkip).stream()
+                            .map(offerMapper::offerToOfferResponse).toList());
         } catch (DataAccessException e) {
             throw new ServiceException("Error occurred when getting offers by bidder", e);
         }

@@ -1,6 +1,5 @@
 package pl.com.tenderflex.controller;
 
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,8 +49,9 @@ public class OfferController {
 
     @GetMapping("/my_offers")
     @ResponseStatus(HttpStatus.OK)
-    public List<OfferResponse> getAllByBidder(@AuthenticationPrincipal(expression = "id") Integer bidderId) {
-        return offerService.getOffersByBidder(bidderId);
+    public Page<OfferResponse> getAllByBidder(@AuthenticationPrincipal(expression = "id") Integer bidderId,
+            @RequestParam(defaultValue = "1") Integer currentPage) {
+        return offerService.getOffersByBidder(bidderId, currentPage);
     }
 
     @GetMapping("/details_for_bidder/{id}")

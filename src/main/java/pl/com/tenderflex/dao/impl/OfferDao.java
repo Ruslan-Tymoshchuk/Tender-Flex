@@ -29,9 +29,10 @@ public class OfferDao implements OfferRepository {
             + "LEFT JOIN contact_persons cp ON cp.id = org.contact_person_id WHERE o.id = ?";
     public static final String GET_OFFERS_BY_BIDDER_QUERY = "SELECT o.id, org.organization_name, t.cpv_code, o.bid_price, o.currency, "
             + "org.country, o.publication_date, o.bidder_status FROM offers o LEFT JOIN organizations org ON org.id = o.organization_id "
-            + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE bidder_id = ?";
+            + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE bidder_id = ? LIMIT ? OFFSET ?";
     public static final String COUNT_OFFERS_BY_CONTRACTOR = "SELECT count(o.id) FROM offers o "
             + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE t.contractor_id = ?";
+    public static final String COUNT_OFFERS_BY_BIDDER = "SELECT count(id) FROM offers WHERE bidder_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final OrganizationDao organizationDao;
@@ -87,12 +88,18 @@ public class OfferDao implements OfferRepository {
     }
 
     @Override
-    public List<Offer> getByBidder(Integer bidderId) {
-        return jdbcTemplate.query(GET_OFFERS_BY_BIDDER_QUERY, offerBidderMapper, bidderId);
+    public List<Offer> getByBidder(Integer bidderId, Integer amountOffers, Integer amountOffersToSkip) {
+        return jdbcTemplate.query(GET_OFFERS_BY_BIDDER_QUERY, offerBidderMapper, bidderId, amountOffers,
+                amountOffersToSkip);
     }
 
     @Override
     public Integer countOffersByContractor(Integer contractorId) {
         return jdbcTemplate.queryForObject(COUNT_OFFERS_BY_CONTRACTOR, Integer.class, contractorId);
+    }
+
+    @Override
+    public Integer countOffersByBidder(Integer bidderId) {
+        return jdbcTemplate.queryForObject(COUNT_OFFERS_BY_BIDDER, Integer.class, bidderId);
     }
 }
