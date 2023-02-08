@@ -93,6 +93,6 @@ public class OfferDao implements OfferRepository {
 
     @Override
     public Integer countOffersByContractor(Integer contractorId) {
-        return jdbcTemplate.queryForObject(COUNT_OFFERS_BY_TENDER_QUERY, Integer.class, contractorId);
+        return jdbcTemplate.queryForObject(COUNT_OFFERS_BY_CONTRACTOR, Integer.class, contractorId);
     }
 }
