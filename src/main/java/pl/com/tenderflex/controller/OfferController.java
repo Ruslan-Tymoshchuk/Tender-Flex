@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.com.tenderflex.dto.OfferDetailsResponse;
 import pl.com.tenderflex.dto.OfferResponse;
+import pl.com.tenderflex.dto.Page;
 import pl.com.tenderflex.dto.OfferDetailsRequest;
 import pl.com.tenderflex.service.OfferService;
 
@@ -35,8 +37,9 @@ public class OfferController {
 
     @GetMapping("/received_offers")
     @ResponseStatus(HttpStatus.OK)
-    public List<OfferResponse> getAllByCondition(@AuthenticationPrincipal(expression = "id") Integer contractorId) {
-        return offerService.getOffersByContractor(contractorId);
+    public Page<OfferResponse> getAllByCondition(@AuthenticationPrincipal(expression = "id") Integer contractorId,
+            @RequestParam(defaultValue = "1") Integer currentPage) {
+        return offerService.getOffersForContractor(contractorId, currentPage);
     }
 
     @GetMapping("/details_for_contractor/{id}")

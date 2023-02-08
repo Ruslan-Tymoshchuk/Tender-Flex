@@ -23,13 +23,15 @@ public class OfferDao implements OfferRepository {
     public static final String GET_OFFERS_BY_CONTRACTOR_QUERY = "SELECT o.id, org.organization_name, t.cpv_code, o.bid_price, "
             + "o.currency, org.country, o.publication_date, o.contractor_status FROM offers o "
             + "LEFT JOIN organizations org ON org.id = o.organization_id "
-            + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE t.contractor_id = ?";
+            + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE t.contractor_id = ? LIMIT ? OFFSET ?";
     public static final String GET_OFFER_BY_ID_QUERY = "SELECT o.id, organization_name, national_registration_number, country, city, "
             + "first_name, last_name, phone, bid_price, currency, document_name FROM offers o LEFT JOIN organizations org ON org.id = o.id "
             + "LEFT JOIN contact_persons cp ON cp.id = org.contact_person_id WHERE o.id = ?";
     public static final String GET_OFFERS_BY_BIDDER_QUERY = "SELECT o.id, org.organization_name, t.cpv_code, o.bid_price, o.currency, "
             + "org.country, o.publication_date, o.bidder_status FROM offers o LEFT JOIN organizations org ON org.id = o.organization_id "
             + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE bidder_id = ?";
+    public static final String COUNT_OFFERS_BY_CONTRACTOR = "SELECT count(o.id) FROM offers o "
+            + "LEFT JOIN tenders t ON t.id = o.tender_id WHERE t.contractor_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final OrganizationDao organizationDao;
@@ -74,8 +76,9 @@ public class OfferDao implements OfferRepository {
     }
 
     @Override
-    public List<Offer> getByContractor(Integer contractorId) {
-        return jdbcTemplate.query(GET_OFFERS_BY_CONTRACTOR_QUERY, offerContractorMapper, contractorId);
+    public List<Offer> getByContractor(Integer contractorId, Integer amountOffers, Integer amountOffersToSkip) {
+        return jdbcTemplate.query(GET_OFFERS_BY_CONTRACTOR_QUERY, offerContractorMapper, contractorId, amountOffers,
+                amountOffersToSkip);
     }
 
     @Override
@@ -86,5 +89,10 @@ public class OfferDao implements OfferRepository {
     @Override
     public List<Offer> getByBidder(Integer bidderId) {
         return jdbcTemplate.query(GET_OFFERS_BY_BIDDER_QUERY, offerBidderMapper, bidderId);
+    }
+
+    @Override
+    public Integer countOffersByContractor(Integer contractorId) {
+        return jdbcTemplate.queryForObject(COUNT_OFFERS_BY_TENDER_QUERY, Integer.class, contractorId);
     }
 }

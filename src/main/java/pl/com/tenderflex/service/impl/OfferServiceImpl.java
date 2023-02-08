@@ -2,6 +2,8 @@ package pl.com.tenderflex.service.impl;
 
 import static java.time.LocalDate.*;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.com.tenderflex.dao.OfferRepository;
 import pl.com.tenderflex.dto.OfferDetailsResponse;
 import pl.com.tenderflex.dto.OfferResponse;
+import pl.com.tenderflex.dto.Page;
 import pl.com.tenderflex.dto.MapStructMapper;
 import pl.com.tenderflex.dto.OfferDetailsRequest;
 import pl.com.tenderflex.exception.ServiceException;
@@ -19,6 +22,8 @@ import pl.com.tenderflex.service.OfferService;
 @Service
 public class OfferServiceImpl implements OfferService {
 
+    @Value("${offers.contractor.per.page}")
+    private Integer offersContractorPerPage;
     public static final String OFFER_RECEIVED_STATUS = "OFFER RECEIVED";
     public static final String OFFER_SENT_STATUS = "OFFER SENT";
 
@@ -51,10 +56,21 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public List<OfferResponse> getOffersByContractor(Integer contractorId) {
+    public Page<OfferResponse> getOffersForContractor(Integer contractorId, Integer currentPage) {
+        Integer amountOffers = currentPage * offersContractorPerPage;
+        Integer amountOffersToSkip = (currentPage - 1) * 5;
+        Integer allOffersAmount = offerRepository.countOffersByContractor(contractorId);
+        Integer totalPages = 1;
+        if (allOffersAmount >= offersContractorPerPage) {
+            totalPages = allOffersAmount / offersContractorPerPage;
+            if (allOffersAmount % offersContractorPerPage > 0) {
+                totalPages++;
+            }
+        }
         try {
-            return offerRepository.getByContractor(contractorId).stream().map(offerMapper::offerToOfferResponse)
-                    .toList();
+            return new Page<>(currentPage, totalPages,
+                    offerRepository.getByContractor(contractorId, amountOffers, amountOffersToSkip).stream()
+                            .map(offerMapper::offerToOfferResponse).toList());
         } catch (DataAccessException e) {
             throw new ServiceException("Error occurred when getting offers by contractor", e);
         }
