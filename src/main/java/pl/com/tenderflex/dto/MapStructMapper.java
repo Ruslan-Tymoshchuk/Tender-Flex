@@ -7,6 +7,7 @@ import pl.com.tenderflex.dao.OfferRepository;
 import pl.com.tenderflex.dao.TenderRepository;
 import pl.com.tenderflex.model.Offer;
 import pl.com.tenderflex.model.Tender;
+import pl.com.tenderflex.model.User;
 
 @Mapper(componentModel = "spring")
 public abstract class MapStructMapper {
@@ -123,4 +124,9 @@ public abstract class MapStructMapper {
     @Mapping(target = "deadlineForSignedContractSubmission", source = "deadlineForSignedContract", dateFormat = "dd-MM-yyyy")
     @Mapping(target = "contractFileNameByContractor", source = "contractFileName")
     public abstract BidderTenderDetailsResponse tenderToBidderTenderDetailsResponse(Tender tender);
+
+    @Mapping(target = "login", source = "email")
+    @Mapping(target = "role", source = "role")
+    @Mapping(target = "lastLoginDate", source = "lastLoginDate")
+    public abstract UserDetailsResponse userToUserDetailsResponse(User user);
 }

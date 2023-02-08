@@ -1,5 +1,7 @@
 package pl.com.tenderflex.dao.impl;
 
+import java.time.LocalDate;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import pl.com.tenderflex.dao.UserRepository;
@@ -10,17 +12,29 @@ import pl.com.tenderflex.model.User;
 public class UserDao implements UserRepository {
 
     public static final String GET_USER_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
-    
+    public static final String UPDATE_LOGIN_TIME_QUERY = "UPDATE users SET login_date = ? WHERE id = ?";
+    public static final String GET_ALL_USERS_QUERY = "SELECT * FROM users";
+
     private final JdbcTemplate jdbcTemplate;
     private final UserMapper userMapper;
-    
+
     public UserDao(JdbcTemplate jdbcTemplate, UserMapper userMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userMapper = userMapper;
     }
-    
+
     @Override
     public User getByEmail(String email) {
         return jdbcTemplate.queryForObject(GET_USER_BY_EMAIL_QUERY, userMapper, email);
+    }
+
+    @Override
+    public void updateLoginDate(Integer userId, LocalDate loginDate) {
+        jdbcTemplate.update(UPDATE_LOGIN_TIME_QUERY, loginDate, userId);
+    }
+
+    @Override
+    public List<User> getAll() {
+        return jdbcTemplate.query(GET_ALL_USERS_QUERY, userMapper);
     }
 }

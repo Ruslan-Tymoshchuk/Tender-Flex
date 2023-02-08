@@ -2,9 +2,9 @@ package pl.com.tenderflex.dao.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-
 import pl.com.tenderflex.model.Role;
 import pl.com.tenderflex.model.User;
 
@@ -20,6 +20,7 @@ public class UserMapper implements RowMapper<User> {
         user.setEmail(resultSet.getString("email"));
         user.setPassword(resultSet.getString("password"));
         user.setRole(Role.valueOf(resultSet.getString("role")));
+        user.setLastLoginDate(resultSet.getObject("login_date", LocalDate.class));
         return user;
     }
 }

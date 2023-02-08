@@ -1,5 +1,7 @@
 package pl.com.tenderflex.model;
 
+import java.time.LocalDate;
+
 public class User {
 
     private Integer id;
@@ -8,6 +10,7 @@ public class User {
     private String email;
     private String password;
     private Role role;
+    private LocalDate lastLoginDate;
 
     public Integer getId() {
         return id;
@@ -55,5 +58,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public LocalDate getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public void setLastLoginDate(LocalDate lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
     }
 }

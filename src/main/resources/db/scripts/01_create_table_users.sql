@@ -4,5 +4,6 @@ CREATE TABLE users (
     last_name VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
     password VARCHAR NOT NULL,
-    role VARCHAR NOT NULL
+    role VARCHAR NOT NULL,
+    login_date TIMESTAMP
 );

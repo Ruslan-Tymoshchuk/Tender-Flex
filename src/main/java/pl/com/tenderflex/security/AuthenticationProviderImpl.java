@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pl.com.tenderflex.exception.AuthenticationProviderException;
 import pl.com.tenderflex.exception.UserNotFoundException;
 import pl.com.tenderflex.model.User;
@@ -25,6 +26,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
     }
 
     @Override
+    @Transactional
     public Authentication authenticate(Authentication authentication) {
         try {
             User userDetails = userService.getByEmail(authentication.getName());
@@ -32,6 +34,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
             if (!passwordEncoder.matches(password, userDetails.getPassword())) {
                 throw new BadCredentialsException("Incorrect password");
             } else {
+                userService.updateLoginDate(userDetails.getId());
                 return new UsernamePasswordAuthenticationToken(userDetails, password,
                         Collections.singleton(new SimpleGrantedAuthority(String.valueOf(userDetails.getRole()))));
             }
