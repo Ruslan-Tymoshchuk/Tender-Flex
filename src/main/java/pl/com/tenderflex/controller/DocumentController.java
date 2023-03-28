@@ -3,6 +3,8 @@ package pl.com.tenderflex.controller;
 import java.io.IOException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +22,7 @@ public class DocumentController {
 
     private final FileStorageService fileStorageService;
 
-    @Secured("CONTRACTOR")
+    @Secured({ "BIDDER", "CONTRACTOR" })
     @PostMapping("/upload")
     public MultipartFileResponse uploadDocument(@AuthenticationPrincipal(expression = "id") Integer userId,
             @RequestParam MultipartFile document) throws IOException {
@@ -28,5 +30,11 @@ public class DocumentController {
             throw new FileNotExistsException("File is not exists");
         }
         return fileStorageService.upload(document, userId);
+    }
+    
+    @Secured({ "BIDDER", "CONTRACTOR" })
+    @GetMapping("/location/{document_name}")
+    public MultipartFileResponse getPresignedUrl(@PathVariable("document_name") String documentName) {
+        return fileStorageService.getPresignedUrl(documentName);
     }
 }

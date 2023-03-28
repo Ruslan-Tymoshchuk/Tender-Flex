@@ -2,6 +2,7 @@ package pl.com.tenderflex.service;
 
 import pl.com.tenderflex.payload.Page;
 import pl.com.tenderflex.payload.request.TenderDetailsRequest;
+import pl.com.tenderflex.payload.response.BidderTenderDetailsResponse;
 import pl.com.tenderflex.payload.response.BidderTenderResponse;
 import pl.com.tenderflex.payload.response.ContractorTenderDetailsResponse;
 import pl.com.tenderflex.payload.response.ContractorTenderResponse;
@@ -9,13 +10,15 @@ import pl.com.tenderflex.payload.response.ContractorTenderResponse;
 public interface TenderService {
 
     void createTender(TenderDetailsRequest tenderDetails, Integer contractorId);
-
-    Integer getTendersAmountByContractor(Integer contractorId);
     
-    Page<ContractorTenderResponse> getByContractor(Integer contractorId, Integer currentPage);
+    Page<ContractorTenderResponse> getByContractor(Integer contractorId, Integer currentPage, Integer tendersPerPage);
 
-    Page<BidderTenderResponse> getByCondition(Integer currentPage);
+    Page<BidderTenderResponse> getByBidder(Integer bidderId, Integer currentPage, Integer tendersPerPage);
 
-    ContractorTenderDetailsResponse getById(Integer tenderId);
+    ContractorTenderDetailsResponse getByIdForContractor(Integer tenderId);
+    
+    BidderTenderDetailsResponse getByIdForBidder(Integer tenderId, Integer bidderId);
+
+    BidderTenderDetailsResponse getTenderByOfferId(Integer offerId);
 
 }

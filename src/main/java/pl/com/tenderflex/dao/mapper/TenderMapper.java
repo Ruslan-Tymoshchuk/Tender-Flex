@@ -5,16 +5,16 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import lombok.RequiredArgsConstructor;
+import pl.com.tenderflex.model.CPV;
 import pl.com.tenderflex.model.ContactPerson;
 import pl.com.tenderflex.model.Country;
 import pl.com.tenderflex.model.Currency;
 import pl.com.tenderflex.model.Organization;
 import pl.com.tenderflex.model.Tender;
+import pl.com.tenderflex.model.TenderStatus;
 import pl.com.tenderflex.model.TenderType;
 
 @Component
-@RequiredArgsConstructor
 public class TenderMapper implements RowMapper<Tender> {
    
     @Override
@@ -22,7 +22,7 @@ public class TenderMapper implements RowMapper<Tender> {
         return Tender
                 .builder()
                 .id(resultSet.getInt("id"))
-                .contractorId(resultSet.getInt("contractor_id"))
+                .userId(resultSet.getInt("contractor_id"))
                 .organization(Organization
                         .builder()
                         .id(resultSet.getInt("organization_id"))
@@ -42,10 +42,19 @@ public class TenderMapper implements RowMapper<Tender> {
                                 .phone(resultSet.getString("phone"))
                                 .build())
                         .build())                
-                .cpvCode(resultSet.getString("cpv_code"))
+                .cpv(CPV.builder()
+                        .id(resultSet.getInt("cpv_id"))
+                        .code(resultSet.getString("code"))
+                        .description(resultSet.getString("description"))
+                        .build())
                 .type(TenderType.valueOf(resultSet.getString("tender_type")))
+                .status(TenderStatus.builder()
+                        .id(resultSet.getInt("id"))
+                        .status(resultSet.getString("status"))
+                        .build())
                 .details(resultSet.getString("details"))
                 .minPrice(resultSet.getInt("min_price"))
+                .maxPrice(resultSet.getInt("max_price"))
                 .currency(Currency
                         .builder()
                         .id(resultSet.getInt("currency_id"))
@@ -54,9 +63,9 @@ public class TenderMapper implements RowMapper<Tender> {
                 .publication(resultSet.getObject("publication_date", LocalDate.class))
                 .deadline(resultSet.getObject("deadline", LocalDate.class))
                 .deadlineForSignedContract(resultSet.getObject("deadline_for_signed_contract", LocalDate.class))
-                .contractUrl(resultSet.getString("contract_url"))
-                .awardDecisionUrl(resultSet.getString("award_decision_url"))
-                .rejectDecisionUrl(resultSet.getString("reject_decision_url"))
+                .contractFileName(resultSet.getString("contract_file_name"))
+                .awardDecisionFileName(resultSet.getString("award_decision_file_name"))
+                .rejectDecisionFileName(resultSet.getString("reject_decision_file_name"))
                 .build();
     }
 }

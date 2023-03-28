@@ -15,7 +15,7 @@ public class TenderDetailsRequest {
     private String firstName;
     private String lastName;
     private String phone;
-    private String cpvCode;
+    private Integer cpvId;
     private TenderType type;
     private String details;
     private Integer minPrice;
@@ -27,8 +27,8 @@ public class TenderDetailsRequest {
     private LocalDate deadline;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deadlineForSignedContract;
-    private String contractUrl;
-    private String awardDecisionUrl;
-    private String rejectDecisionUrl;
+    private String contractFileName;
+    private String awardDecisionFileName;
+    private String rejectDecisionFileName;
 
 }

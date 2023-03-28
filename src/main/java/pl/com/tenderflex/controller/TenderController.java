@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.tenderflex.payload.Page;
 import pl.com.tenderflex.payload.request.TenderDetailsRequest;
+import pl.com.tenderflex.payload.response.BidderTenderDetailsResponse;
 import pl.com.tenderflex.payload.response.BidderTenderResponse;
 import pl.com.tenderflex.payload.response.ContractorTenderDetailsResponse;
 import pl.com.tenderflex.payload.response.ContractorTenderResponse;
@@ -32,27 +33,37 @@ public class TenderController {
     }
 
     @Secured("CONTRACTOR")
-    @GetMapping("/contractor/total")
-    public Integer getAmountTendersByContractor(@AuthenticationPrincipal(expression = "id") Integer contractorId) {
-        return tenderService.getTendersAmountByContractor(contractorId);
-    }
-
-    @Secured("CONTRACTOR")
-    @GetMapping("/contractor/list")
+    @GetMapping("/list/contractor")
     public Page<ContractorTenderResponse> getAllByContractor(@RequestParam(defaultValue = "1") Integer currentPage,
+            @RequestParam(defaultValue = "10") Integer tendersPerPage,
             @AuthenticationPrincipal(expression = "id") Integer contractorId) {
-        return tenderService.getByContractor(contractorId, currentPage);
+        return tenderService.getByContractor(contractorId, currentPage, tendersPerPage);
     }
 
     @Secured("BIDDER")
-    @GetMapping("/bidder/list")
-    public Page<BidderTenderResponse> getAllByCondition(@RequestParam(defaultValue = "1") Integer currentPage) {
-        return tenderService.getByCondition(currentPage);
+    @GetMapping("/list/bidder")
+    public Page<BidderTenderResponse> getAllByBidder(@AuthenticationPrincipal(expression = "id") Integer bidderId, 
+            @RequestParam(defaultValue = "1") Integer currentPage,
+            @RequestParam(defaultValue = "10") Integer tendersPerPage) {
+        return tenderService.getByBidder(bidderId, currentPage, tendersPerPage);
     }
 
     @Secured("CONTRACTOR")
-    @GetMapping("/details/{id}")
-    public ContractorTenderDetailsResponse getTenderById(@PathVariable("id") Integer tenderId) {
-        return tenderService.getById(tenderId);
+    @GetMapping("/details/contractor/{id}")
+    public ContractorTenderDetailsResponse getTenderByIdForContractor(@PathVariable("id") Integer tenderId) {
+        return tenderService.getByIdForContractor(tenderId);
+    }
+    
+    @Secured("BIDDER")
+    @GetMapping("/details/offer/{id}")
+    public BidderTenderDetailsResponse getTenderByOfferId(@PathVariable("id") Integer offerId) {
+        return tenderService.getTenderByOfferId(offerId);
+    }
+     
+    @Secured("BIDDER")
+    @GetMapping("/details/bidder/{id}")
+    public BidderTenderDetailsResponse getTenderByIdForBidder(@PathVariable("id") Integer tenderId, 
+            @AuthenticationPrincipal(expression = "id") Integer bidderId) {
+        return tenderService.getByIdForBidder(tenderId, bidderId);
     }
 }
